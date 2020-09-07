@@ -39,7 +39,7 @@ export function createExpressApp(config: IConfig): express.Express {
   return app;
 }
 
-  app.get('profile/:profileId', (req: Request, res: Response) => { 
+  app.get('/:profileId', (req: Request, res: Response) => { 
     const profileId = req.params["profileId"]; 
 
     Profile.findById(profileId, '_id email', (err, profile) => {
