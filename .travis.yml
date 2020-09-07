@@ -5,7 +5,7 @@ stages:
   - lint
 
 jobs:
-  includes:
+  include:
   - name: Eslint
   stage: lint
   install: npm install
@@ -15,8 +15,8 @@ jobs:
     - trasnpile
 
   jobs:
-    includes:
-      - name: Transpile
+    include:
+    - name: Transpile
       stage: transpile
       install: npm install
       script: npm run build
