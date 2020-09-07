@@ -2,32 +2,22 @@ langage : node_js
 node_js: 12
 
 stages:
-  - Global Testing
-  - ':rocket: Deployment'
+  - global testing
+  - deployment
 
 jobs:
   include:
-  - stage: Global Testing
+  - stage: global testing
     name: compile
     install: npm install
     script: npm build
 
-  - stage: Global Testing
+  - stage: global testing
     name: tests
     install: npm install
     script: npm test
 
-
-
-  - stage: global testing
-    name: Eslint
-    stage: lint
-    install: npm install
-    script: npm run build
-
-
-  - stage: global testing
+  - stage: Transpile
     name: Transpile
-    stage: transpile
     install: npm install
     script: npm run build
