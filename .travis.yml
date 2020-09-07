@@ -9,11 +9,14 @@ jobs:
   - name: Eslint
   stage: lint
   install: npm install
-  script: npm start
+  script: npm run build
 
   stages: 
     - trasnpile
 
   jobs:
     includes:
-      - name: 
+      - name: Transpile
+      stage: transpile
+      install: npm install
+      script: npm run build
