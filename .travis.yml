@@ -12,11 +12,6 @@ jobs:
     install: npm install
     script: npm build
 
-  - stage: global testing
-    name: tests
-    install: npm install
-    script: npm test
-
   - stage: Transpile
     name: Transpile
     install: npm install
