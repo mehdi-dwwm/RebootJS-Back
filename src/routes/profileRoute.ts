@@ -1,7 +1,7 @@
 
 import { Router, Request, Response } from 'express';
-import { Profile } from '../models/profiles';
-import { getAllProfiles, getProfile } from '../controllers/profiles';
+import { Profile, IProfile } from '../models/profiles';
+import { getAllProfiles, getProfile, updateProfile } from '../controllers/profiles';
 import { authenticationRequired } from '../middlewares/authenticationRequired';
 
 const router = Router();
@@ -35,7 +35,7 @@ router.get("/:profileId", authenticationRequired, (req: Request, res: Response) 
 )
 });
 
-router.get("/",  (req: Request, res: Response) => {
+router.get("/",  authenticationRequired, (req: Request, res: Response) => {
     getAllProfiles()
         .then(profiles => profiles.map(profile => profile.getSafeProfile()))
         .then(safeProfiles => {
@@ -45,6 +45,36 @@ router.get("/",  (req: Request, res: Response) => {
         console.error(error);
         return res.status(500).send();
     })
+})
+
+router.patch("/", authenticationRequired, (req: Request, res: Response) => {
+  if(!req.user) {return res.status(401).send()}
+  const { email, firstname, lastname, password } = req.body;
+
+  updateProfile(req.user as IProfile, email, firstname, lastname, password)
+    .then(profile => {
+      if(!profile) return res.status(404).send("Profile not found");
+      return res.status(200).send(profile.getSafeProfile());
+    })
+    .catch(error => {
+      console.error(error);
+      return res.status(500).send();
+    });
+})
+
+router.delete('/', authenticationRequired, (req: Request, res: Response) => {
+  if(!req.user) { return res.status(401).send() }
+  (req.user as IProfile).deleteOne()
+    .then(_profile => res.status(200).send('Utilisateur supprimé'))
+    .catch(error => {
+      console.error(error);
+      return res.status(500).send();
+    });
+})
+
+router.get("/me", authenticationRequired, (req: Request, res: Response) => {
+  if(!req.user) { return res.status(401).send() }
+  return res.json((req.user as IProfile).getSafeProfile());
 })
 
 
