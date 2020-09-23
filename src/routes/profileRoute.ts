@@ -21,6 +21,11 @@ router.post("/", (req: Request, res: Response) => {
   res.send('Utilisateur créé !');
 });
 
+router.get("/me", authenticationRequired, (req: Request, res: Response) => {
+  if(!req.user) { return res.status(401).send() }
+  return res.json((req.user as IProfile).getSafeProfile());
+})
+
 router.get("/:profileId", authenticationRequired, (req: Request, res: Response) => {
   const profileId = req.params['profileId'];
 
@@ -72,12 +77,7 @@ router.delete('/', authenticationRequired, (req: Request, res: Response) => {
     });
 })
 
-router.get("/me", authenticationRequired, (req: Request, res: Response) => {
-  if(!req.user) { return res.status(401).send() }
-  return res.json((req.user as IProfile).getSafeProfile());
-})
-
-router.patch("/conversation-seen/:conversationID", authenticationRequired, async (req: Request, res: Response) => {
+router.patch("/conversation_seen/:conversationID", authenticationRequired, async (req: Request, res: Response) => {
   const user = req.user as IProfile;
   const conversationID = req.params['conversationId'];
 

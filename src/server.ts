@@ -54,5 +54,7 @@ const config = configuration();
 const { PORT } = config;
 const app = createExpressApp(config);
 connect(config).then(
-  () => { app.listen(PORT, () => console.log(`Flint messenger listening at ${PORT}`)) }
+  () => { app.listen(PORT, () => console.log(`Flint messenger listening at ${PORT}`))
+   
+}
 );
