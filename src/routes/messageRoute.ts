@@ -24,13 +24,16 @@ router.post('/', authenticationRequired, async (req: Request, res: Response) => 
     const { conversationId, targets, content} = req.body;
     const user = req.user as IProfile;
     const message = await messageController.createMessage(conversationId, targets, user._id, content);
-    res.json(message);
+    res.status(200).send(message);
 
     return await Promise.all(
         message.targets.map(async (target) => {
-            const profile = await Profile.findById(target)
+            const profile = await Profile.findById(target);
+            console.log(profile);
             const socketId = profile?.socket;
+            console.log(socketId);
             if(socketId){
+                console.log('message envoyé');
                 io.to(socketId).emit('chat-message', message.toJSON())
             }
         })

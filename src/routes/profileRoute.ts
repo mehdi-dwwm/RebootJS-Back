@@ -6,50 +6,9 @@ import { authenticationRequired } from '../middlewares/authenticationRequired';
 
 const router = Router();
 
-router.post("/", (req: Request, res: Response) => {
-  const { email, firstname, lastname, password } = req.body;
-
-  const newProfile = new Profile ({ email: email, firstname: firstname, lastname: lastname});
-  newProfile.setPassword(password);
-  newProfile.save()
-    .then(profile => {
-      return res.send(profile.getSafeProfile());
-      }).catch(error => {
-        console.error(error);
-        return res.status(500).send();
-      });
-  res.send('Utilisateur créé !');
-});
-
 router.get("/me", authenticationRequired, (req: Request, res: Response) => {
   if(!req.user) { return res.status(401).send() }
   return res.json((req.user as IProfile).getSafeProfile());
-})
-
-router.get("/:profileId", authenticationRequired, (req: Request, res: Response) => {
-  const profileId = req.params['profileId'];
-
-  getProfile(profileId)
-  .then(profile => {
-    if(profile === null) { return res.status(404).send("Profile not found"); }
-    return res.send(profile.getSafeProfile());
-  }).catch(error => {
-    console.error(error);
-    return res.status(500).send()
-  }
-)
-});
-
-router.get("/",  authenticationRequired, (req: Request, res: Response) => {
-    getAllProfiles()
-        .then(profiles => profiles.map(profile => profile.getSafeProfile()))
-        .then(safeProfiles => {
-        return res.status(200).send(safeProfiles);
-        })
-        .catch(error => {
-        console.error(error);
-        return res.status(500).send();
-    })
 })
 
 router.patch("/", authenticationRequired, (req: Request, res: Response) => {
@@ -75,6 +34,47 @@ router.delete('/', authenticationRequired, (req: Request, res: Response) => {
       console.error(error);
       return res.status(500).send();
     });
+})
+
+router.post("/", (req: Request, res: Response) => {
+  const { email, firstname, lastname, password } = req.body;
+
+  const newProfile = new Profile ({ email: email, firstname: firstname, lastname: lastname});
+  newProfile.setPassword(password);
+  newProfile.save()
+    .then(profile => {
+      return res.send(profile.getSafeProfile());
+      }).catch(error => {
+        console.error(error);
+        return res.status(500).send();
+      });
+  res.send('Utilisateur créé !');
+});
+
+router.get("/:profileId", authenticationRequired, (req: Request, res: Response) => {
+  const profileId = req.params['profileId'];
+
+  getProfile(profileId)
+  .then(profile => {
+    if(profile === null) { return res.status(404).send("Profile not found"); }
+    return res.send(profile.getSafeProfile());
+  }).catch(error => {
+    console.error(error);
+    return res.status(500).send()
+  }
+)
+});
+
+router.get("/",  authenticationRequired, (req: Request, res: Response) => {
+    getAllProfiles()
+        .then(profiles => profiles.map(profile => profile.getSafeProfile()))
+        .then(safeProfiles => {
+        return res.status(200).send(safeProfiles);
+        })
+        .catch(error => {
+        console.error(error);
+        return res.status(500).send();
+    })
 })
 
 router.patch("/conversation_seen/:conversationID", authenticationRequired, async (req: Request, res: Response) => {

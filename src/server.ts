@@ -11,7 +11,11 @@ import messageRoute from './routes/messageRoute';
 import session from 'express-session';
 import connectMongo from 'connect-mongo';
 import mongoose from 'mongoose';
+import webrtcRoute from './routes/webrtcRoute';
+import { initializeSockets } from './socket';
+
 const MongoStore = connectMongo(session);
+const sessionStore = new MongoStore({mongooseConnection: mongoose.connection})
 
 export function createExpressApp(config: IConfig): express.Express {
   const { express_debug, session_secret, session_cookie_name } = config;
@@ -31,7 +35,7 @@ export function createExpressApp(config: IConfig): express.Express {
     secret: session_secret,
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({mongooseConnection: mongoose.connection})
+    store: sessionStore
   }))
 
   app.use(authenticationInitialize());
@@ -45,6 +49,7 @@ export function createExpressApp(config: IConfig): express.Express {
   app.use('/profile', profileRoutes);
   app.use('/login', loginRoute);
   app.use('/messages', messageRoute);
+  app.use('/webrtc', webrtcRoute);
   app.get('/', (req: Request, res: Response) => { res.send('This is the boilerplate for Flint Messenger app') });
 
   return app;
@@ -54,7 +59,10 @@ const config = configuration();
 const { PORT } = config;
 const app = createExpressApp(config);
 connect(config).then(
-  () => { app.listen(PORT, () => console.log(`Flint messenger listening at ${PORT}`))
-   
-}
+  () => { 
+    const server = app.listen(PORT, () => console.log(`Flint messenger listening at ${PORT}`))
+
+    // Initialise les sockets
+    initializeSockets(config, server, sessionStore);
+  }
 );

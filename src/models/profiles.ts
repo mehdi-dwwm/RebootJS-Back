@@ -23,6 +23,7 @@ const profileSchema = new Schema({
     firstname: {type: String, required: true},
     lastname: {type: String, required: true},
     password: { type: String, require: true},
+    socket: { type: String},
     conversationSeen: { type: Object }
 });
 
