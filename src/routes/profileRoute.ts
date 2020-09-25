@@ -60,7 +60,7 @@ router.get("/:profileId", authenticationRequired, (req: Request, res: Response) 
     return res.send(profile.getSafeProfile());
   }).catch(error => {
     console.error(error);
-    return res.status(500).send()
+    return res.status(500).send();
   }
 )
 });
