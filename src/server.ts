@@ -30,13 +30,23 @@ export function createExpressApp(config: IConfig): express.Express {
     origin: true
   }));
 
-  app.use(session({
+  const sessionConfig : session.SessionOptions = {
     name: session_cookie_name,
     secret: session_secret,
     resave: false,
     saveUninitialized: false,
-    store: sessionStore
-  }))
+    store : sessionStore,
+    cookie : {}
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); //trust first proxy
+    sessionConfig.cookie = {
+      secure : true,
+      sameSite : 'none'
+    }
+  }
+  app.use(session(sessionConfig));
 
   app.use(authenticationInitialize());
   app.use(authenticationSession());
